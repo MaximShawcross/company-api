@@ -30,6 +30,7 @@
 		"@nestjs/platform-express": "^9.0.0",
 		"@nestjs/typeorm": "^9.0.1",
 		"@types/passport-local": "^1.0.35",
+		"class-validator": "^0.14.0",
 		"passport": "^0.6.0",
 		"passport-jwt": "^4.0.1",
 		"passport-local": "^1.0.0",
