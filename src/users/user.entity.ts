@@ -1,13 +1,14 @@
 import { Entity } from "typeorm";
+import { IUser, IUserWithPass } from "./interfaces/user.interface";
 
 @Entity()
-export default class User {
+export default class User implements IUserWithPass {
 	constructor(
-		email: string, password: string, 
+		email: string, password: string,
 		first_name: string, last_name: string,
 		nick_name: string, phone_number: string,
-		description: string, position: string	
-		) {
+		description: string, position: string
+	) {
 		this.email = email;
 		this.password = password;
 		this.first_name = first_name;

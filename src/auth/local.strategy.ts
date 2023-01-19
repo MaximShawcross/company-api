@@ -4,14 +4,15 @@ import { AuthService } from "./auth.service";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import User from "src/users/user.entity";
+import { IUser } from "src/users/interfaces/user.interface";
 
 @Injectable()
 export default class LocalStrategy extends PassportStrategy(Strategy) {
-	constructor( private authService: AuthService ) {
+	constructor(private authService: AuthService) {
 		super();
 	}
 
-	async validate(nickName: string, password: string): Promise<User> {
+	async validate(nickName: string, password: string): Promise<IUser> {
 		const user = await this.authService.validateUser(nickName, password);
 
 		if (!user) {
