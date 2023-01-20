@@ -5,12 +5,14 @@ import { UsersModule } from './users/users.module';
 import { AuthGuard } from '@nestjs/passport/dist';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
 	imports: [
 		AuthModule, 
 		UsersModule,
-		TypeOrmModule.forRoot(typeOrmConfig)
+		TypeOrmModule.forRoot(typeOrmConfig),
+		CompaniesModule
 	],
 	controllers: [AppController],
 	providers: [],

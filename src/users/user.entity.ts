@@ -3,6 +3,16 @@ import { IUser, IUserWithPass } from "./interfaces/user.interface";
 
 @Entity()
 export default class User implements IUserWithPass {
+	id: number;
+	email: string;
+	password: string;
+	first_name: string;
+	last_name: string;
+	nick_name: string;
+	phone_number: string;
+	description: string;
+	position: string;
+	
 	constructor(
 		email: string, password: string,
 		first_name: string, last_name: string,
@@ -19,21 +29,4 @@ export default class User implements IUserWithPass {
 		this.position = position;
 	}
 
-	id: number;
-
-	email: string;
-
-	password: string;
-
-	first_name: string;
-
-	last_name: string;
-
-	nick_name: string;
-
-	phone_number: string;
-
-	description: string;
-
-	position: string;
 };
