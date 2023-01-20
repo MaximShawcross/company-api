@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserSchema } from 'src/models/user.model';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import User from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -8,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Controller('users')
 export class UsersController {
 	constructor(
-		@InjectRepository(UserSchema) private userRepository: Repository<User>,
+		@InjectRepository(User) private userRepository: Repository<User>,
 		private dataSource: DataSource
 	) { }
 
