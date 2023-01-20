@@ -6,7 +6,7 @@ import { Company } from "src/companies/company.entity";
 export default class User implements IUserWithPass {
 	@PrimaryGeneratedColumn()
 	id: number;
-	
+
 	@Column()
 	email: string;
 
@@ -31,7 +31,8 @@ export default class User implements IUserWithPass {
 	@Column()
 	position: string;
 	
-	// @OneToMany(type => Company, company => company.)
+	@OneToMany(type => Company, company => company.user)
+	companies: Company[];
 
 	constructor(
 		email: string, password: string,

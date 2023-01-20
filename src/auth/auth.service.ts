@@ -32,7 +32,8 @@ export class AuthService {
 			nick_name: user.nick_name,
 			phone_number: user.phone_number,
 			description: user.description,
-			position: user.position
+			position: user.position,
+			companies: user.companies
 		}
 
 		return {

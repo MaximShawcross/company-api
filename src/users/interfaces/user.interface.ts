@@ -1,3 +1,5 @@
+import { Company } from "src/companies/company.entity";
+
 export interface IUser {
 	id: number;
 	email: string;
@@ -7,6 +9,7 @@ export interface IUser {
 	phone_number: string;
 	description: string;
 	position: string;
+	companies: Company[]
 }
 
 export interface IUserWithPass extends IUser{
