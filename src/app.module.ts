@@ -17,6 +17,4 @@ import { CompaniesModule } from './companies/companies.module';
 	controllers: [AppController],
 	providers: [],
 })
-export class AppModule { 
-	
-}
+export class AppModule { }
