@@ -8,14 +8,14 @@ import User from 'src/users/user.entity';
 @Injectable()
 export class CompaniesService {
 	constructor(
-		@InjectRepository(Company) private companieRepository: Repository<Company>,
+		@InjectRepository(Company) private companyRepository: Repository<Company>,
 		private dataSource: DataSource
 	) {
-		
+
 	}
 
 	async create(companyDto: CreateCompanyDto, user: User) {
-		const newCompany = await this.companieRepository.save({
+		const newCompany = await this.companyRepository.save({
 			name: companyDto.name,
 			description: companyDto.description,
 			numberOfEmployees: companyDto.numberOfEmployees,
@@ -30,8 +30,11 @@ export class CompaniesService {
 		return newCompany;
 	}
 
-	async findAll(): Promise<Company[]> {
-		return this.companieRepository.find();
+
+	async findAll(user: User): Promise<Company[]> {
+		return user.companies;
+
+		// return this.companyRepository.find();
 	}
 
 	findOne(id: number) {

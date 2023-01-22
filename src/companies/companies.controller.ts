@@ -15,14 +15,18 @@ export class CompaniesController {
 	@UseGuards(JwtAuthGuard)
 	@Post("/create")
 	async create(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<Company> {
-		const user = await this.userService.findOne(req.user.nick_name);
+		const user = await this.userService.findOne(req.user.id);
 
 		return await this.companiesService.create(createCompanyDto, user);
 	}
 
+	//find current user companies 
+	@UseGuards(JwtAuthGuard)
 	@Get()
-	async findAll(): Promise<Company[]> {
-		return await this.companiesService.findAll();
+	async findAll(@Request() req): Promise<Company[]> {
+		const user = await this.userService.findOne(req.user.id);
+
+		return await this.companiesService.findAll(user);
 	}
 
 	@Get(':id')
