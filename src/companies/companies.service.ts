@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './company.entity';
@@ -59,7 +59,14 @@ export class CompaniesService {
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(editingCompany));
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} company`;
+	remove(id: number, user: User,) {
+		const company = user.companies.find((company: Company) => company.id === id);
+
+		if( !company ) {
+			///Write custom exeption
+			throw new BadRequestException();
+		}	
+
+		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company))
 	}
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Put, Req } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Company } from './company.entity';
@@ -40,16 +40,22 @@ export class CompaniesController {
 	@Patch(':id')
 	async update(
 		@Request() req,
-		@Param('id') id: string, 
+		@Param('id') id: string,
 		@Body() updateCompanyDto: UpdateCompanyDto,
 	) {
-		const user: User = await this.userService.findOne(req.user.id);		
+		const user: User = await this.userService.findOne(req.user.id);
 
 		return this.companiesService.update(+id, updateCompanyDto, user);
 	}
 
+	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.companiesService.remove(+id);
+	async remove(
+		@Param('id') id: string,
+		@Request() req
+	) {
+		const user: User = await this.userService.findOne(req.user.id);
+
+		return this.companiesService.remove(+id, user);
 	}
 }
