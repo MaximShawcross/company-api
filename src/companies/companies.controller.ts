@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Put, Req } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Company } from './company.entity';
 import JwtAuthGuard from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import User from 'src/users/user.entity';
 
 @Controller('companies')
 export class CompaniesController {
@@ -15,14 +17,18 @@ export class CompaniesController {
 	@UseGuards(JwtAuthGuard)
 	@Post("/create")
 	async create(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<Company> {
-		const user = await this.userService.findOne(req.user.nick_name);
+		const user: User = await this.userService.findOne(req.user.id);
 
 		return await this.companiesService.create(createCompanyDto, user);
 	}
 
+	//find current user companies 
+	@UseGuards(JwtAuthGuard)
 	@Get()
-	async findAll(): Promise<Company[]> {
-		return await this.companiesService.findAll();
+	async findAll(@Request() req): Promise<Company[]> {
+		const user: User = await this.userService.findOne(req.user.id);
+
+		return await this.companiesService.findAll(user);
 	}
 
 	@Get(':id')
@@ -30,13 +36,26 @@ export class CompaniesController {
 		return this.companiesService.findOne(+id);
 	}
 
-	//   @Patch(':id')
-	//   update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-	//     return this.companiesService.update(+id, updateCompanyDto);
-	//   }
+	@UseGuards(JwtAuthGuard)
+	@Patch(':id')
+	async update(
+		@Request() req,
+		@Param('id') id: string,
+		@Body() updateCompanyDto: UpdateCompanyDto,
+	) {
+		const user: User = await this.userService.findOne(req.user.id);
 
+		return this.companiesService.update(+id, updateCompanyDto, user);
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.companiesService.remove(+id);
+	async remove(
+		@Param('id') id: string,
+		@Request() req
+	) {
+		const user: User = await this.userService.findOne(req.user.id);
+
+		return this.companiesService.remove(+id, user);
 	}
 }

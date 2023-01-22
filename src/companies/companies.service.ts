@@ -1,21 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './company.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import User from 'src/users/user.entity';
-// 
+import { UpdateCompanyDto } from './dto/update-company.dto';
+
 @Injectable()
 export class CompaniesService {
 	constructor(
-		@InjectRepository(Company) private companieRepository: Repository<Company>,
+		@InjectRepository(Company) private companyRepository: Repository<Company>,
 		private dataSource: DataSource
-	) {
-		
-	}
+	) { }
 
 	async create(companyDto: CreateCompanyDto, user: User) {
-		const newCompany = await this.companieRepository.save({
+		const newCompany = await this.companyRepository.save({
 			name: companyDto.name,
 			description: companyDto.description,
 			numberOfEmployees: companyDto.numberOfEmployees,
@@ -30,19 +29,44 @@ export class CompaniesService {
 		return newCompany;
 	}
 
-	async findAll(): Promise<Company[]> {
-		return this.companieRepository.find();
+
+	async findAll(user: User): Promise<Company[]> {
+		return user.companies;
+
 	}
 
 	findOne(id: number) {
 		return `This action returns a #${id} company`;
 	}
 
-	// update(id: number, updateCompanyDto: UpdateCompanyDto) {
-	// 	return `This action updates a #${id} company`;
-	// }
+	async update(id: number, companyDto: UpdateCompanyDto, user: User) {
+		const company = user.companies.find((company: Company) => company.id === id);
 
-	remove(id: number) {
-		return `This action removes a #${id} company`;
+		if( !company ) {
+			throw new NotFoundException();
+		}	
+		// if company exist, find this company in database. Then every value of field
+		// existed company overrid by value from same field on dto. 
+		let editingCompany = await this.companyRepository.findOneBy({id: company.id});	
+		for(let key in editingCompany) {
+			for(let keyDto in companyDto) {
+				if (key === keyDto) {
+					editingCompany[key] = companyDto[keyDto];
+				}
+			}
+		}
+
+		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(editingCompany));
+	}
+
+	remove(id: number, user: User,) {
+		const company = user.companies.find((company: Company) => company.id === id);
+
+		if( !company ) {
+			///Write custom exeption
+			throw new BadRequestException();
+		}	
+
+		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company))
 	}
 }
