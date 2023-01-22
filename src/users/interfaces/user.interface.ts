@@ -1,8 +1,17 @@
+import { Company } from "src/companies/company.entity";
+
 export interface IUser {
-	userId: number,
-	username: string,
+	id: number;
+	email: string;
+	first_name: string;
+	last_name: string;
+	nick_name: string;
+	phone_number: string;
+	description: string;
+	position: string;
+	companies: Company[]
 }
 
-export interface IUserWithPass extends IUser {
-	password: string	
+export interface IUserWithPass extends IUser{
+	password: string;
 }
