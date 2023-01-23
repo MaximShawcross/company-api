@@ -6,6 +6,9 @@ import JwtAuthGuard from 'src/auth/jwt-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import User from 'src/users/user.entity';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { Role } from 'src/common/decorators/roles/role.enum';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('companies')
 export class CompaniesController {
@@ -14,6 +17,7 @@ export class CompaniesController {
 		private userService: UsersService
 	) { }
 
+	// create method company
 	@UseGuards(JwtAuthGuard)
 	@Post("/create")
 	async create(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<Company> {
@@ -31,11 +35,7 @@ export class CompaniesController {
 		return await this.companiesService.findAll(user);
 	}
 
-	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.companiesService.findOne(+id);
-	}
-
+	// update company method
 	@UseGuards(JwtAuthGuard)
 	@Patch(':id')
 	async update(
@@ -45,9 +45,22 @@ export class CompaniesController {
 	) {
 		const user: User = await this.userService.findOne(req.user.id);
 
-		return this.companiesService.update(+id, updateCompanyDto, user);
+		return await this.companiesService.update(+id, updateCompanyDto, user);
 	}
 
+	//// update company method -- admin role --
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.Admin)
+	@Patch('/admin/:id')
+	async updateAdmin(
+		@Request() req,
+		@Param('id') id: string,
+		@Body() updateCompanyDto: UpdateCompanyDto,
+	) {
+		return await this.companiesService.update(+id, updateCompanyDto);
+	}
+
+	// remove companie
 	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
 	async remove(

@@ -29,27 +29,30 @@ export class CompaniesService {
 		return newCompany;
 	}
 
-
+	// find all curent user companies method
 	async findAll(user: User): Promise<Company[]> {
 		return user.companies;
-
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} company`;
-	}
+	// update company method
+	async update(id: number, companyDto: UpdateCompanyDto, user?: User): Promise<Company | undefined> {
+		let editingCompany: Company;
 
-	async update(id: number, companyDto: UpdateCompanyDto, user: User) {
-		const company = user.companies.find((company: Company) => company.id === id);
+		if (user) {
+			const company = user.companies.find((company: Company) => company.id === id);
+			editingCompany = company ? await this.companyRepository.findOneBy({ id: company.id }) : undefined;
+		} else {
+			editingCompany = await this.companyRepository.findOneBy({ id });
+		}
 
-		if( !company ) {
+		if (!editingCompany) {
 			throw new NotFoundException();
-		}	
+		}
+
 		// if company exist, find this company in database. Then every value of field
 		// existed company overrid by value from same field on dto. 
-		let editingCompany = await this.companyRepository.findOneBy({id: company.id});	
-		for(let key in editingCompany) {
-			for(let keyDto in companyDto) {
+		for (let key in editingCompany) {
+			for (let keyDto in companyDto) {
 				if (key === keyDto) {
 					editingCompany[key] = companyDto[keyDto];
 				}
@@ -59,13 +62,14 @@ export class CompaniesService {
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(editingCompany));
 	}
 
-	remove(id: number, user: User,) {
+	//remove company method
+	async remove(id: number, user: User,) {
 		const company = user.companies.find((company: Company) => company.id === id);
 
-		if( !company ) {
+		if (!company) {
 			///Write custom exeption
 			throw new BadRequestException();
-		}	
+		}
 
 		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company))
 	}

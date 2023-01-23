@@ -6,7 +6,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { Role } from 'src/common/decorators/roles/role.enum';
 import { Request, UseGuards } from '@nestjs/common/decorators';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import JwtAuthGuard from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 
@@ -16,7 +15,9 @@ export class UsersController {
 		@InjectRepository(User) private userRepository: Repository<User>,
 		private dataSource: DataSource
 	) { }
-
+	// find all users(admin role)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.Admin)
 	@Get("/find")
 	async users(): Promise<User[]> {
 		const users = await this.userRepository.find();
@@ -24,6 +25,8 @@ export class UsersController {
 		return users;
 	}
 
+
+	//create user(register)
 	@Post("/create")
 	async create(@Body() userDto: CreateUserDto) {
 		const user = new User(
@@ -36,6 +39,7 @@ export class UsersController {
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
 	}
 
+	// test method
 	@Get("/admin")
 	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles(Role.Admin)
