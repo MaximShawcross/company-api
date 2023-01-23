@@ -3,6 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import User from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { Role } from 'src/common/decorators/roles/role.enum';
+import { Request, UseGuards } from '@nestjs/common/decorators';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import JwtAuthGuard from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -28,5 +34,12 @@ export class UsersController {
 		);
 
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
+	}
+
+	@Get("/admin")
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.Admin)
+	getAdminRole(@Request() req) {
+		console.log(req.user.roles);
 	}
 }

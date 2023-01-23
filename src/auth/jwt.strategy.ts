@@ -24,7 +24,8 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
 			phone_number: payload.phone_number,
 			description: payload.description,
 			position: payload.position,
-			companies: payload.companies
+			companies: payload.companies,
+			roles: payload.roles
 		}
 	}
 
