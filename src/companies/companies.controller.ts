@@ -57,10 +57,24 @@ export class CompaniesController {
 		@Param('id') id: string,
 		@Body() updateCompanyDto: UpdateCompanyDto,
 	) {
-		return await this.companiesService.update(+id, updateCompanyDto);
+		const user: User = await this.userService.findOne(req.user.id);
+
+		return await this.companiesService.update(+id, updateCompanyDto, user);
 	}
 
 	// remove companie
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.Admin)
+	@Delete('/admin/:id')
+	async removeAdmin(
+		@Param('id') id: string,
+		@Request() req
+	) {
+		const user: User = await this.userService.findOne(req.user.id);
+
+		return this.companiesService.remove(+id, user);
+	}
+
 	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
 	async remove(

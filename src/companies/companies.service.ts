@@ -5,6 +5,7 @@ import { Company } from './company.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import User from 'src/users/user.entity';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Role } from 'src/common/decorators/roles/role.enum';
 
 @Injectable()
 export class CompaniesService {
@@ -35,15 +36,18 @@ export class CompaniesService {
 	}
 
 	// update company method
-	async update(id: number, companyDto: UpdateCompanyDto, user?: User): Promise<Company | undefined> {
-		let editingCompany: Company;
+	async update(id: number, companyDto: UpdateCompanyDto, user: User): Promise<Company | undefined> {
+		const adminRole = user.roles.find(role => role === Role.Admin);	
+		const company = user.companies.find((company: Company) => company.id === id);
 
-		if (user) {
-			const company = user.companies.find((company: Company) => company.id === id);
-			editingCompany = company ? await this.companyRepository.findOneBy({ id: company.id }) : undefined;
-		} else {
-			editingCompany = await this.companyRepository.findOneBy({ id });
+		if (!company && !adminRole) {
+			throw new NotFoundException();
 		}
+		
+		// if user don't have admin role - find companie that belongs to user,
+		// if user got admin role - looks for company independent from user    
+		const editingCompany: Company = adminRole ?	 
+		await this.companyRepository.findOneBy({ id }) : await this.companyRepository.findOneBy({ id: company.id });
 
 		if (!editingCompany) {
 			throw new NotFoundException();
@@ -64,11 +68,14 @@ export class CompaniesService {
 
 	//remove company method
 	async remove(id: number, user: User,) {
-		const company = user.companies.find((company: Company) => company.id === id);
+		const adminRole: Role = user.roles.find(role => role === Role.Admin);	
+
+		const company: Company = adminRole ? await this.companyRepository.findOneBy( {id} ) 
+		: user.companies.find((company: Company) => company.id === id) ;
 
 		if (!company) {
 			///Write custom exeption
-			throw new BadRequestException();
+			throw new NotFoundException();
 		}
 
 		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company))
