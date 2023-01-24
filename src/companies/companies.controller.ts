@@ -32,7 +32,7 @@ export class CompaniesController {
 	async findAll(@Request() req): Promise<Company[]> {
 		const user: User = await this.userService.findOne(req.user.id);
 
-		return await this.companiesService.findAll(user);
+		return await this.companiesService.findUserCompanies(user);
 	}
 
 	// update company method

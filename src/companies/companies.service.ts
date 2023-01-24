@@ -13,32 +13,31 @@ export class CompaniesService {
 		@InjectRepository(Company) private companyRepository: Repository<Company>,
 		private dataSource: DataSource
 	) { }
-
+	
+	// make new company instance, push it to current user aray and then commit changes
 	async create(companyDto: CreateCompanyDto, user: User) {
-		const newCompany = await this.companyRepository.save({
-			name: companyDto.name,
-			description: companyDto.description,
-			numberOfEmployees: companyDto.numberOfEmployees,
-			serviceOfActivity: companyDto.serviceOfActivity,
-			type: companyDto.type,
-			adress: companyDto.adress
-		})
+		const company = new Company(
+			companyDto.name, companyDto.adress, companyDto.serviceOfActivity,
+			companyDto.numberOfEmployees, companyDto.description, companyDto.type
+		);
 
-		user.companies = [...user.companies, newCompany];
+		user.companies = [...user.companies, company];
 
+		await this.dataSource.transaction(async manager => await manager.save(company));
 		await this.dataSource.transaction(async manager => await manager.save(user));
-		return newCompany;
+
+		return company;
 	}
 
 	// find all curent user companies method
-	async findAll(user: User): Promise<Company[]> {
+	async findUserCompanies(user: User): Promise<Company[]> {
 		return user.companies;
 	}
 
 	// update company method
 	async update(id: number, companyDto: UpdateCompanyDto, user: User): Promise<Company | undefined> {
-		const adminRole = user.roles.find(role => role === Role.Admin);	
-		const company = user.companies.find((company: Company) => company.id === id);
+		const adminRole: Role = user.roles.find(role => role === Role.Admin);	
+		const company: Company = user.companies.find((company: Company) => company.id === id);
 
 		if (!company && !adminRole) {
 			throw new NotFoundException();
@@ -78,6 +77,6 @@ export class CompaniesService {
 			throw new NotFoundException();
 		}
 
-		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company))
+		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company));
 	}
 }
