@@ -14,11 +14,11 @@ export class UsersService {
 
 	/// method can find user by id or nick_name
 	async findOne(id: number): Promise<User | undefined>
-	async findOne(nickName: string): Promise<User | undefined> 
+	async findOne(email: string): Promise<User | undefined> 
 	async findOne(idOrNick: string | number): Promise<User | undefined> {
 		if( typeof idOrNick === "string" ) {
 			return this.usersRepository.findOne({ 
-				where: { nick_name: idOrNick },
+				where: { email: idOrNick },
 				relations: ['companies']
 			})
 		} else {

@@ -9,6 +9,8 @@ import User from 'src/users/user.entity';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { Role } from 'src/common/decorators/roles/role.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { IUserPayload } from 'src/users/interfaces/user.payload.interface';
+
 
 @Controller('companies')
 export class CompaniesController {
