@@ -3,7 +3,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './company.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import User from 'src/users/user.entity';
+import User from '../users/user.entity';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Role } from 'src/common/decorators/roles/role.enum';
 

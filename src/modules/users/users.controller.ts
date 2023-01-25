@@ -6,13 +6,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { Role } from 'src/common/decorators/roles/role.enum';
 import { Request, UseGuards } from '@nestjs/common/decorators';
-import JwtAuthGuard from 'src/auth/jwt-auth.guard';
+import JwtAuthGuard from '../auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import UpdateUserDto from './dto/update-user.dto';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { UsersService } from './users.service';
 import { Patch } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { UserRequest } from 'src/types/types';
 
 @Controller('users')
 export class UsersController {
@@ -21,6 +22,7 @@ export class UsersController {
 		private usersService: UsersService,
 		private dataSource: DataSource
 	) { }
+	
 	// find all users(admin role)
 	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles(Role.Admin)
@@ -30,9 +32,8 @@ export class UsersController {
 
 		return users;
 	}
-
-
-	//create user(register)
+	
+	// register new user endpoint
 	@Post("/create")
 	async create(@Body() userDto: CreateUserDto): Promise<User> {
 		const user = new User(
@@ -45,26 +46,26 @@ export class UsersController {
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
 	}
 
+	// update any user by admin endpoint 
 	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles(Role.Admin)
-	// @Patch("/admin/edit-user/::id")
 	@Patch("/admin/edit-user/:id")
 	async changeUser(
-		@Body() userDto: UpdateUserDto, 
+		@Body() userDto: UpdateUserDto,
 		@Param("id") id: string,
-		@Request() req
+		@Request() req: UserRequest
 	): Promise<User> {
 		const user: User = await this.usersService.findOne(+id);
 
 		return await this.usersService.update(user, userDto);
-		return user;
 	}
+	
+	//get user self informatiom
+	@UseGuards(JwtAuthGuard)
+	@Get('/profile')
+	async getProfile(@Request() req: UserRequest): Promise<User> {
+		const userId = req.user.id;
 
-	// test method
-	@Get("/admin")
-	@UseGuards(JwtAuthGuard, RolesGuard)
-	@Roles(Role.Admin)
-	getAdminRole(@Request() req) {
-		console.log(req.user.roles);
+		return await this.usersService.findOne(userId);
 	}
 }

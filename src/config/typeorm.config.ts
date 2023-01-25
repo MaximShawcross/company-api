@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { Company } from "src/companies/company.entity";
-import User from "src/users/user.entity";
+import { Company } from "src/modules/companies/company.entity";
+import User from "src/modules/users/user.entity";
 
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
