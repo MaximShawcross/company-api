@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { IUser, IUserWithPass } from "./interfaces/user.interface";
 import { Company } from "src/companies/company.entity";
+import { Role } from "src/common/decorators/roles/role.enum";
 
 @Entity()
 export default class User implements IUserWithPass {
@@ -33,6 +34,15 @@ export default class User implements IUserWithPass {
 	
 	@OneToMany(type => Company, company => company.user)
 	companies: Company[];
+
+	@Column({
+		type: "enum",
+		enum: Role,
+		array: true,
+		nullable: true,
+		default: [Role.User],
+	})
+	roles: Role[]
 
 	constructor(
 		email: string, password: string,

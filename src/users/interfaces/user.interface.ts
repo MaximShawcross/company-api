@@ -1,3 +1,4 @@
+import { Role } from "src/common/decorators/roles/role.enum";
 import { Company } from "src/companies/company.entity";
 
 export interface IUser {
@@ -9,7 +10,8 @@ export interface IUser {
 	phone_number: string;
 	description: string;
 	position: string;
-	companies: Company[]
+	companies: Company[],
+	roles: Role[]
 }
 
 export interface IUserWithPass extends IUser{

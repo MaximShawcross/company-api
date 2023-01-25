@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import User from './user.entity';
+import UpdateUserDto from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectRepository(User) private usersRepository: Repository<User>
+		@InjectRepository(User) private usersRepository: Repository<User>,
+		private dataSource: DataSource
 	) { }
 
 	/// method can find user by id or nick_name
@@ -25,6 +27,23 @@ export class UsersService {
 				relations: ['companies']
 			})
 		} 
+	}
+	
+	//admin meth for update choosen user
+	async update(user: User, userDto: UpdateUserDto): Promise<User> {
+		if (!user) {
+			throw new NotFoundException();
+		}
+
+		for (let key in user) {
+			for (let keyDto in userDto) {
+				if (key === keyDto) {
+					user[key] = userDto[keyDto];
+				}
+			}
+		}
+
+		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
 	}
 
 }
