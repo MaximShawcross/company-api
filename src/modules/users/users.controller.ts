@@ -8,7 +8,6 @@ import { Role } from 'src/common/decorators/roles/role.enum';
 import { Request, UseGuards } from '@nestjs/common/decorators';
 import JwtAuthGuard from '../auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { AuthGuard } from '@nestjs/passport';
 import UpdateUserDto from './dto/update-user.dto';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { UsersService } from './users.service';
@@ -42,6 +41,8 @@ export class UsersController {
 			userDto.nick_name, userDto.description,
 			userDto.phone_number, userDto.position
 		);
+		
+		console.log("user created!");
 
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
 	}
@@ -67,5 +68,10 @@ export class UsersController {
 		const userId = req.user.id;
 
 		return await this.usersService.findOne(userId);
+	}
+
+	@Get("/log")
+	async log () {
+		console.log("works");
 	}
 }

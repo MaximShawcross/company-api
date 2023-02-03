@@ -1,15 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Put, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Company } from './company.entity';
 import JwtAuthGuard from '../auth/jwt-auth.guard';
-import { UsersService } from '../users/users.service';
+import { UsersService } from "@users/users.service";
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import User from '../users/user.entity';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { Role } from 'src/common/decorators/roles/role.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { IUserPayload } from '../users/interfaces/user.payload.interface';
 
 
 @Controller('companies')
