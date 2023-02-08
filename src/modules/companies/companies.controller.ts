@@ -1,3 +1,4 @@
+import { UserRequest } from './../../types/types.d';
 import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -21,7 +22,7 @@ export class CompaniesController {
 	// create method company
 	@UseGuards(JwtAuthGuard)
 	@Post("/create")
-	async create(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<Company> {
+	async create(@Body() createCompanyDto: CreateCompanyDto, @Request() req: UserRequest): Promise<Company> {
 		const user: User = await this.userService.findOne(req.user.id);
 
 		return await this.companiesService.create(createCompanyDto, user);
@@ -30,7 +31,7 @@ export class CompaniesController {
 	//find current user companies 
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async findAll(@Request() req): Promise<Company[]> {
+	async findAll(@Request() req: UserRequest): Promise<Company[]> {
 		const user: User = await this.userService.findOne(req.user.id);
 
 		return await this.companiesService.findUserCompanies(user);
@@ -40,7 +41,7 @@ export class CompaniesController {
 	@UseGuards(JwtAuthGuard)
 	@Patch(':id')
 	async update(
-		@Request() req,
+		@Request() req: UserRequest,
 		@Param('id') id: string,
 		@Body() updateCompanyDto: UpdateCompanyDto,
 	) {
@@ -54,7 +55,7 @@ export class CompaniesController {
 	@Roles(Role.Admin)
 	@Patch('/admin/:id')
 	async updateAdmin(
-		@Request() req,
+		@Request() req: UserRequest,
 		@Param('id') id: string,
 		@Body() updateCompanyDto: UpdateCompanyDto,
 	) {
@@ -69,7 +70,7 @@ export class CompaniesController {
 	@Delete('/admin/:id')
 	async removeAdmin(
 		@Param('id') id: string,
-		@Request() req
+		@Request() req: UserRequest
 	) {
 		const user: User = await this.userService.findOne(req.user.id);
 
@@ -80,10 +81,21 @@ export class CompaniesController {
 	@Delete(':id')
 	async remove(
 		@Param('id') id: string,
-		@Request() req
+		@Request() req: UserRequest
 	) {
 		const user: User = await this.userService.findOne(req.user.id);
 
 		return this.companiesService.remove(+id, user);
+	}
+
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(Role.Admin)
+	@Get("/admin")
+	async findAllCompanies(
+		@Request() req: UserRequest
+	) {
+		const companies = await this.companiesService.findAllCompanies();
+		
+		return companies;	
 	}
 }

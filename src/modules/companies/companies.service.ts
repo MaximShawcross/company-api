@@ -79,4 +79,9 @@ export class CompaniesService {
 
 		return this.dataSource.transaction(async (manager: EntityManager) => await manager.remove(company));
 	}
+
+	// find every companie across application -- admin ---
+	async findAllCompanies(): Promise<Company[]> {
+		return await this.companyRepository.find();
+	}
 }

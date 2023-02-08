@@ -35,16 +35,9 @@ export class UsersController {
 	// register new user endpoint
 	@Post("/create")
 	async create(@Body() userDto: CreateUserDto): Promise<User> {
-		const user = new User(
-			userDto.email, userDto.password,
-			userDto.first_name, userDto.last_name,
-			userDto.nick_name, userDto.description,
-			userDto.phone_number, userDto.position
-		);
+		const user = this.usersService.register(userDto);
 		
-		console.log("user created!");
-
-		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
+		return user;
 	}
 
 	// update any user by admin endpoint 
@@ -70,8 +63,4 @@ export class UsersController {
 		return await this.usersService.findOne(userId);
 	}
 
-	@Get("/log")
-	async log () {
-		console.log("works");
-	}
 }
