@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { IUser, IUserWithPass } from "./interfaces/user.interface";
-import { Company } from "src/companies/company.entity";
+import { Company } from "@companies/company.entity";
 import { Role } from "src/common/decorators/roles/role.enum";
 
 @Entity()
@@ -8,7 +8,9 @@ export default class User implements IUserWithPass {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
+	@Column({
+		unique: true
+	})
 	email: string;
 
 	@Column()

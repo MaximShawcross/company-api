@@ -1,5 +1,5 @@
 import { Role } from "src/common/decorators/roles/role.enum";
-import { Company } from "src/companies/company.entity";
+import { Company } from "src/modules/companies/company.entity";
 
 export interface IUser {
 	id: number;

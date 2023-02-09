@@ -1,3 +1,4 @@
+import { CreateUserDto } from './dto/create-user.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,11 +15,11 @@ export class UsersService {
 
 	/// method can find user by id or nick_name
 	async findOne(id: number): Promise<User | undefined>
-	async findOne(nickName: string): Promise<User | undefined> 
+	async findOne(email: string): Promise<User | undefined> 
 	async findOne(idOrNick: string | number): Promise<User | undefined> {
 		if( typeof idOrNick === "string" ) {
 			return this.usersRepository.findOne({ 
-				where: { nick_name: idOrNick },
+				where: { email: idOrNick },
 				relations: ['companies']
 			})
 		} else {
@@ -42,6 +43,20 @@ export class UsersService {
 				}
 			}
 		}
+
+		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
+	}
+
+	//register
+	async register(userDto: CreateUserDto): Promise<User> {
+		const user = new User(
+			userDto.email, userDto.password,
+			userDto.first_name, userDto.last_name,
+			userDto.nick_name, userDto.description,
+			userDto.phone_number, userDto.position
+		);
+		
+		console.log("user created!");
 
 		return await this.dataSource.transaction(async (manager: EntityManager) => await manager.save(user));
 	}
